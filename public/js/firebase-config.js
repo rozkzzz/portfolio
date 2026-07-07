@@ -6,13 +6,14 @@
 //  Until ENABLED = true, the site runs on local sample data (data/sample.js)
 // ============================================================
 
-export const ENABLED = false;
+export const ENABLED = true;
 
-export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+const firebaseConfig = {
+  apiKey: "AIzaSyBX3_6hBJjnZxEGWvODlHcqiNiA9wHxX7w",
+  authDomain: "portfolio-5c311.firebaseapp.com",
+  projectId: "portfolio-5c311",
+  storageBucket: "portfolio-5c311.firebasestorage.app",
+  messagingSenderId: "460876063133",
+  appId: "1:460876063133:web:03d0cc546b64af840bcf74",
+  measurementId: "G-BWVJ6VZ670"
 };
