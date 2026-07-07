@@ -1,0 +1,12 @@
+{
+  "name": "portfolio-seed",
+  "private": true,
+  "type": "module",
+  "description": "One-time Firestore seeder for the 0day-style portfolio.",
+  "scripts": {
+    "seed": "node seed.mjs"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.1.0"
+  }
+}

@@ -1,0 +1,17 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Portfolio is public: anyone can READ entries and profile.
+    // Nobody can WRITE from the client — edit data via the Firebase
+    // Console or the Admin SDK seed script (seed/seed.mjs).
+    match /entries/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+    match /profile/{id} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

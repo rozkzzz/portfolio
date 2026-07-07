@@ -1,0 +1,309 @@
+import { ENABLED, firebaseConfig } from "./firebase-config.js";
+import { sampleEntries, sampleProfile } from "./sample.js";
+
+const FIRE_VER = "10.12.2";
+let entries = [];
+let profile = sampleProfile;
+let activeCat = "all";
+let query = "";
+let activeView = "table";
+
+// ---------- data loading ----------
+async function loadData() {
+  if (!ENABLED) {
+    entries = sampleEntries.slice();
+    profile = sampleProfile;
+    setSource("local sample");
+    return;
+  }
+  try {
+    const { initializeApp } = await import(
+      `https://www.gstatic.com/firebasejs/${FIRE_VER}/firebase-app.js`
+    );
+    const { getFirestore, collection, getDocs, doc, getDoc, query: fq, orderBy } =
+      await import(`https://www.gstatic.com/firebasejs/${FIRE_VER}/firebase-firestore.js`);
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const snap = await getDocs(fq(collection(db, "entries"), orderBy("date", "desc")));
+    entries = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+
+    const pSnap = await getDoc(doc(db, "profile", "main"));
+    if (pSnap.exists()) profile = { ...sampleProfile, ...pSnap.data() };
+
+    setSource("firestore");
+  } catch (err) {
+    console.warn("Firestore load failed, using local sample:", err);
+    entries = sampleEntries.slice();
+    profile = sampleProfile;
+    setSource("local (fallback)");
+  }
+}
+
+function setSource(s) {
+  const el = document.getElementById("statSource");
+  if (el) el.textContent = s;
+}
+
+// ---------- rendering ----------
+const riskLabel = { high: "0DAY", med: "MEDIUM", low: "PATCHED" };
+
+function filtered() {
+  return entries.filter((e) => {
+    const catOk = activeCat === "all" || e.category === activeCat;
+    if (!catOk) return false;
+    if (!query) return true;
+    const hay = `${e.title} ${e.description} ${(e.stack || []).join(" ")} ${e.category}`.toLowerCase();
+    return hay.includes(query);
+  });
+}
+
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, (c) =>
+    ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+  );
+}
+
+function renderView() {
+  const list = filtered();
+  document.getElementById("count").textContent = `${list.length} records`;
+  const tableView = document.getElementById("tableView");
+  const timelineView = document.getElementById("timelineView");
+  const title = document.getElementById("panelTitle");
+  if (activeView === "timeline") {
+    tableView.hidden = true;
+    timelineView.hidden = false;
+    title.textContent = "// CAREER TIMELINE";
+    renderTimeline(list);
+  } else {
+    timelineView.hidden = true;
+    tableView.hidden = false;
+    title.textContent = "// LATEST ENTRIES";
+    renderRows(list);
+  }
+}
+
+function renderRows(list) {
+  const rows = document.getElementById("rows");
+
+  if (!list.length) {
+    rows.innerHTML = `<tr><td colspan="6" class="empty">// no entries found — try another filter</td></tr>`;
+    return;
+  }
+
+  rows.innerHTML = list
+    .map((e, i) => {
+      const risk = (e.risk || "low").toLowerCase();
+      const stack = (e.stack || []).slice(0, 3).map((s) => esc(s)).join(", ");
+      return `<tr data-idx="${i}">
+        <td class="c-date">${esc(e.date || "")}</td>
+        <td class="c-title">
+          <div class="entry-title">${esc(e.title || "untitled")}</div>
+          <div class="entry-desc">${esc(e.description || "")}</div>
+        </td>
+        <td class="c-cat"><span class="tag">${esc(e.category || "misc")}</span></td>
+        <td class="c-stack"><span class="stack">${stack || "&mdash;"}</span></td>
+        <td class="c-risk"><span class="risk ${risk}">${riskLabel[risk] || "PATCHED"}</span></td>
+        <td class="c-num num">${Number(e.views || 0).toLocaleString()}</td>
+      </tr>`;
+    })
+    .join("");
+
+  rows.querySelectorAll("tr[data-idx]").forEach((tr) => {
+    tr.addEventListener("click", () => openModal(list[Number(tr.dataset.idx)]));
+  });
+}
+
+function renderTimeline(list) {
+  const el = document.getElementById("timelineView");
+
+  if (!list.length) {
+    el.innerHTML = `<div class="empty">// no entries found — try another filter</div>`;
+    return;
+  }
+
+  // newest first (list is already date-desc), then group by year
+  const groups = new Map();
+  for (const e of list) {
+    const year = (e.date || "----").slice(0, 4);
+    if (!groups.has(year)) groups.set(year, []);
+    groups.get(year).push(e);
+  }
+
+  const flat = []; // keep a flat index so clicks map back to the entry
+  el.innerHTML = [...groups.entries()]
+    .map(([year, items]) => {
+      const label = items.length === 1 ? "1 entry" : `${items.length} entries`;
+      const rows = items
+        .map((e) => {
+          const risk = (e.risk || "low").toLowerCase();
+          const idx = flat.push(e) - 1;
+          return `<div class="tl-item" data-idx="${idx}">
+            <div class="tl-card">
+              <div class="tl-card-head">
+                <span class="tl-date">${esc(e.date || "")}</span>
+                <span class="tag">${esc(e.category || "misc")}</span>
+                <span class="risk ${risk}">${riskLabel[risk] || "PATCHED"}</span>
+              </div>
+              <div class="tl-title">${esc(e.title || "untitled")}</div>
+              <div class="tl-desc">${esc(e.description || "")}</div>
+            </div>
+          </div>`;
+        })
+        .join("");
+      return `<div class="tl-year">
+        <div class="tl-year-label">${esc(year)}<span>${label}</span></div>
+        <div class="tl-items">${rows}</div>
+      </div>`;
+    })
+    .join("");
+
+  el.querySelectorAll(".tl-item").forEach((it) => {
+    it.addEventListener("click", () => openModal(flat[Number(it.dataset.idx)]));
+  });
+}
+
+function renderProfile() {
+  const av = document.getElementById("avatar");
+  if (profile.photo) {
+    av.innerHTML = `<img src="${esc(profile.photo)}" alt="${esc(profile.name || "profile")}"
+      onerror="this.parentElement.textContent='[ ! ]'">`;
+  } else {
+    av.textContent = "[ ! ]";
+  }
+  document.getElementById("ownerName").textContent = profile.name || "anonymous";
+  document.getElementById("ownerRole").textContent = profile.role || "";
+  document.getElementById("ownerBio").textContent = profile.bio || "";
+  const linksEl = document.getElementById("ownerLinks");
+  linksEl.innerHTML = (profile.links || [])
+    .map((l) => `<a href="${esc(l.url)}" target="_blank" rel="noopener">${esc(l.label)}</a>`)
+    .join("");
+  renderSkills();
+}
+
+function skillChip(s) {
+  const hasLevel = s.level != null && s.level !== "";
+  const lvl = hasLevel ? Math.max(0, Math.min(100, Number(s.level) || 0)) : null;
+  const fill = lvl != null ? `<i class="chip-fill" style="width:${lvl}%"></i>` : "";
+  const title = lvl != null ? ` title="${esc(s.name)} — ${lvl}%"` : "";
+  return `<span class="skill-chip"${title}>${fill}<b>${esc(s.name || "")}</b></span>`;
+}
+
+function renderSkills() {
+  const el = document.getElementById("skillList");
+  const raw = profile.skills || [];
+  if (!raw.length) {
+    el.innerHTML = `<div class="skill-empty">// add skills in sample.js</div>`;
+    return;
+  }
+  // normalize: plain string -> { name }
+  const skills = raw.map((s) => (typeof s === "string" ? { name: s } : s));
+
+  // group by category, preserving first-seen order
+  const groups = new Map();
+  for (const s of skills) {
+    const cat = s.category || "other";
+    if (!groups.has(cat)) groups.set(cat, []);
+    groups.get(cat).push(s);
+  }
+
+  el.innerHTML = [...groups.entries()]
+    .map(
+      ([cat, items]) => `<div class="skill-group">
+        <div class="skill-group-title">${esc(cat)} <span>(${items.length})</span></div>
+        <div class="chips">${items.map(skillChip).join("")}</div>
+      </div>`
+    )
+    .join("");
+}
+
+function renderStats() {
+  const total = entries.length;
+  const projects = entries.filter((e) => e.category === "project").length;
+  const views = entries.reduce((a, e) => a + Number(e.views || 0), 0);
+  document.getElementById("statTotal").textContent = total;
+  document.getElementById("statProject").textContent = projects;
+  document.getElementById("statViews").textContent = views.toLocaleString();
+}
+
+// ---------- modal ----------
+function openModal(e) {
+  const body = document.getElementById("modalBody");
+  const risk = (e.risk || "low").toLowerCase();
+  const stack = (e.stack || [])
+    .map((s) => `<span class="tag">${esc(s)}</span>`)
+    .join(" ");
+  body.innerHTML = `
+    <h2>${esc(e.title || "untitled")}</h2>
+    <div class="m-meta">
+      <span>[ ${esc(e.date || "")} ]</span>
+      <span>category: ${esc(e.category || "misc")}</span>
+      <span class="risk ${risk}">${riskLabel[risk] || "PATCHED"}</span>
+      <span>${Number(e.views || 0).toLocaleString()} views</span>
+    </div>
+    <div class="m-body">${esc(e.body || e.description || "")}</div>
+    ${stack ? `<div class="m-stack">${stack}</div>` : ""}
+    ${e.link ? `<div class="m-link"><a href="${esc(e.link)}" target="_blank" rel="noopener">&gt; open link</a></div>` : ""}
+  `;
+  document.getElementById("modal").hidden = false;
+}
+
+function closeModal() {
+  document.getElementById("modal").hidden = true;
+}
+
+// ---------- events ----------
+function wireEvents() {
+  document.getElementById("tabs").addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".tab");
+    if (!btn) return;
+    document.querySelectorAll(".tab").forEach((t) => t.classList.remove("active"));
+    btn.classList.add("active");
+    activeCat = btn.dataset.cat;
+    renderView();
+  });
+
+  document.getElementById("viewtoggle").addEventListener("click", (ev) => {
+    const btn = ev.target.closest(".vbtn");
+    if (!btn) return;
+    document.querySelectorAll(".vbtn").forEach((b) => b.classList.remove("active"));
+    btn.classList.add("active");
+    activeView = btn.dataset.view;
+    renderView();
+  });
+
+  document.getElementById("search").addEventListener("input", (ev) => {
+    query = ev.target.value.trim().toLowerCase();
+    renderView();
+  });
+  document.getElementById("searchform").addEventListener("submit", (ev) => ev.preventDefault());
+
+  document.getElementById("modalClose").addEventListener("click", closeModal);
+  document.getElementById("modal").addEventListener("click", (ev) => {
+    if (ev.target.id === "modal") closeModal();
+  });
+  document.addEventListener("keydown", (ev) => {
+    if (ev.key === "Escape") closeModal();
+  });
+}
+
+function startClock() {
+  const el = document.getElementById("clock");
+  const tick = () => {
+    el.textContent = new Date().toLocaleTimeString("en-GB");
+  };
+  tick();
+  setInterval(tick, 1000);
+  document.getElementById("year").textContent = new Date().getFullYear();
+}
+
+// ---------- boot ----------
+(async function main() {
+  wireEvents();
+  startClock();
+  await loadData();
+  renderProfile();
+  renderStats();
+  renderView();
+})();

@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>0DAY.PORTFOLIO :: exploit-db style portfolio</title>
+  <meta name="description" content="Personal portfolio in 0day.today exploit-database style, powered by Firebase." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet" href="./css/style.css" />
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="#">
+        <span class="brand-mark">[~]</span>
+        <span class="brand-name">0DAY<span class="dot">.</span>PORTFOLIO</span>
+        <span class="brand-sub">// personal exploit database</span>
+      </a>
+      <div class="status">
+        <span class="pill online"><i></i> ONLINE</span>
+        <span id="clock" class="clock">--:--:--</span>
+      </div>
+    </div>
+  </header>
+
+  <nav class="mainnav">
+    <div class="wrap navrow">
+      <ul id="tabs" class="tabs">
+        <li><button class="tab active" data-cat="all">/ ALL</button></li>
+        <li><button class="tab" data-cat="project">/ PROJECTS</button></li>
+        <li><button class="tab" data-cat="experience">/ EXPERIENCE</button></li>
+        <li><button class="tab" data-cat="research">/ RESEARCH</button></li>
+        <li><button class="tab" data-cat="certificate">/ CERTS</button></li>
+      </ul>
+      <form id="searchform" class="searchbox" role="search">
+        <span class="prompt">root@portfolio:~$</span>
+        <input id="search" type="search" placeholder="grep entries..." autocomplete="off" />
+      </form>
+    </div>
+  </nav>
+
+  <main class="wrap layout">
+    <section class="content">
+      <div class="panel">
+        <div class="panel-head">
+          <h1 id="panelTitle" class="panel-title">// LATEST ENTRIES</h1>
+          <div class="head-right">
+            <div class="viewtoggle" id="viewtoggle">
+              <button class="vbtn active" data-view="table">[#] TABLE</button>
+              <button class="vbtn" data-view="timeline">[~] TIMELINE</button>
+            </div>
+            <span id="count" class="badge-count">0 records</span>
+          </div>
+        </div>
+
+        <div id="tableView" class="table-wrap">
+          <table class="db">
+            <thead>
+              <tr>
+                <th class="c-date">DATE</th>
+                <th class="c-title">TITLE / DESCRIPTION</th>
+                <th class="c-cat">CATEGORY</th>
+                <th class="c-stack">STACK</th>
+                <th class="c-risk">RISK</th>
+                <th class="c-num">VIEWS</th>
+              </tr>
+            </thead>
+            <tbody id="rows">
+              <tr><td colspan="6" class="loading">loading database...</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div id="timelineView" class="timeline" hidden></div>
+      </div>
+    </section>
+
+    <aside class="sidebar">
+      <div class="card profile">
+        <div id="avatar" class="avatar">[ ! ]</div>
+        <div class="who">
+          <div id="ownerName" class="owner">anonymous</div>
+          <div id="ownerRole" class="role">// set your role</div>
+        </div>
+        <p id="ownerBio" class="bio">Edit profile in Firestore collection <code>profile/main</code>.</p>
+        <div class="links" id="ownerLinks"></div>
+      </div>
+
+      <div class="card skills">
+        <h2 class="card-title">// SKILLS</h2>
+        <div id="skillList" class="skilllist"></div>
+      </div>
+
+      <div class="card stats">
+        <h2 class="card-title">// STATS</h2>
+        <ul class="statlist">
+          <li><span>Total entries</span><b id="statTotal">0</b></li>
+          <li><span>Projects</span><b id="statProject">0</b></li>
+          <li><span>Total views</span><b id="statViews">0</b></li>
+          <li><span>Data source</span><b id="statSource">local</b></li>
+        </ul>
+      </div>
+
+      <div class="card term">
+        <h2 class="card-title">// SYSTEM</h2>
+        <pre class="miniterm">$ whoami
+> portfolio_owner
+$ uptime
+> since <span id="year">2024</span>
+$ status
+> <span class="ok">all systems go</span></pre>
+      </div>
+    </aside>
+  </main>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card">
+      <button class="modal-close" id="modalClose" aria-label="close">[x]</button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+  <footer class="footer">
+    <div class="wrap">
+      <span>0DAY.PORTFOLIO &mdash; built with Firebase &amp; static HTML</span>
+      <span class="muted">no rights reserved // hack the planet</span>
+    </div>
+  </footer>
+
+  <!-- App logic. Uses Firebase if configured, otherwise falls back to local sample data. -->
+  <script type="module" src="./js/app.js"></script>
+</body>
+</html>
