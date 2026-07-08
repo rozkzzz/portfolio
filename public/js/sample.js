@@ -2,7 +2,7 @@
 // you upload to Firestore later (see seed/seed.mjs). Edit freely.
 
 export const sampleProfile = {
-  name: "your_handle",
+  name: "Tharit_Kaeothong",
   // Your photo: put a file at public/img/profile.jpg and set "./img/profile.jpg",
   // or paste any image URL. Leave "" to show the default terminal avatar.
   photo: "./img/blob.jfif",
