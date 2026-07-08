@@ -5,7 +5,7 @@ export const sampleProfile = {
   name: "your_handle",
   // Your photo: put a file at public/img/profile.jpg and set "./img/profile.jpg",
   // or paste any image URL. Leave "" to show the default terminal avatar.
-  photo: "./img/profile.svg",
+  photo: "./img/blob.jfif",
   role: "// Full-stack dev & security enthusiast",
   bio: "Building things on the internet. Breaking things (ethically) for fun. This portfolio lists my projects, experience and research like an exploit database.",
   links: [
