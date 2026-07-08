@@ -5,13 +5,12 @@ export const sampleProfile = {
   name: "Tharit_Kaeothong",
   // Your photo: put a file at public/img/profile.jpg and set "./img/profile.jpg",
   // or paste any image URL. Leave "" to show the default terminal avatar.
-  photo: "./img/blob.jfif",
-  role: "// Full-stack dev & security enthusiast",
+  photo: "./img/profile.svg",
+  role: "// Network Engineer & System Admin",
   bio: "Building things on the internet. Breaking things (ethically) for fun. This portfolio lists my projects, experience and research like an exploit database.",
   links: [
-    { label: "github", url: "https://github.com/yourname" },
-    { label: "email", url: "mailto:you@example.com" },
-    { label: "linkedin", url: "https://linkedin.com/in/yourname" },
+    { label: "github", url: "https://github.com/rozkzzz" },
+    { label: "email", url: "Tharitkaeothong@gmail.com" },
   ],
   // Skills show as compact chips grouped by "category".
   //   { name: "Laravel", level: 80, category: "Backend" }
@@ -22,8 +21,6 @@ export const sampleProfile = {
   skills: [
     { name: "HTML / CSS", level: 90, category: "Frontend" },
     { name: "JavaScript", level: 85, category: "Frontend" },
-    { name: "React", level: 78, category: "Frontend" },
-    { name: "Tailwind", level: 70, category: "Frontend" },
     { name: "Laravel / PHP", level: 80, category: "Backend" },
     { name: "Node.js", level: 72, category: "Backend" },
     { name: "Python", level: 64, category: "Backend" },
@@ -33,6 +30,21 @@ export const sampleProfile = {
     { name: "Git", level: 82, category: "Tools" },
     { name: "Docker", category: "Tools" },
     { name: "Linux", category: "Tools" },
+    { name: "Switch", category: "Tools" },
+    { name: "Router", category: "Tools" },
+    { name: "Static route", category: "Algorithms" },
+    { name: "Dynamic route", category: "Algorithms" },
+    { name: "Google file system", category: "Algorithms" },
+    { name: "Ceph", category: "Algorithms" },
+    { name: "Java", category: "Languages" },
+    { name: "N8N", category: "Ai" },
+    { name: "Google flow", category: "Ai" },
+    { name: "Rag", category: "Ai" },
+    { name: "AWS", category: "Cloud" },
+    { name: "Nmap", category: "CTF" },
+    { name: "burpsuite", category: "CTF" },
+
+
   ],
 };
 
