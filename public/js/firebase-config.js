@@ -8,7 +8,7 @@
 
 export const ENABLED = true;
 
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBX3_6hBJjnZxEGWvODlHcqiNiA9wHxX7w",
   authDomain: "portfolio-5c311.firebaseapp.com",
   projectId: "portfolio-5c311",
