@@ -143,6 +143,9 @@ function openEntry(entry) {
   $("ef-id").value = entry ? entry.id : "";
   $("ef-date").value = entry ? (entry.date || "") : new Date().toISOString().slice(0, 10);
   $("ef-category").value = entry ? (entry.category || "project") : "project";
+  $("ef-endDate").value = entry ? (entry.endDate || "") : "";
+  $("ef-present").checked = entry ? !!entry.present : false;
+  $("ef-org").value = entry ? (entry.org || "") : "";
   $("ef-title").value = entry ? (entry.title || "") : "";
   $("ef-description").value = entry ? (entry.description || "") : "";
   $("ef-risk").value = entry ? (entry.risk || "low") : "low";
@@ -152,7 +155,16 @@ function openEntry(entry) {
   $("ef-link").value = entry ? (entry.link || "") : "";
   show($("deleteEntryBtn"), !isNew);
   show($("entryError"), false);
+  syncPresent();
   show($("entryModal"), true);
+}
+
+// when "Present" is ticked, the end date is not used
+function syncPresent() {
+  const on = $("ef-present").checked;
+  const end = $("ef-endDate");
+  end.disabled = on;
+  end.style.opacity = on ? ".45" : "1";
 }
 
 function closeEntry() { show($("entryModal"), false); }
@@ -162,8 +174,12 @@ async function saveEntry(e) {
   const err = $("entryError");
   show(err, false);
 
+  const present = $("ef-present").checked;
   const data = {
     date: $("ef-date").value,
+    endDate: present ? "" : $("ef-endDate").value,
+    present,
+    org: $("ef-org").value.trim(),
     category: $("ef-category").value,
     title: $("ef-title").value.trim(),
     description: $("ef-description").value.trim(),
@@ -351,6 +367,7 @@ function wireUI() {
 
   // entries
   $("newEntryBtn").addEventListener("click", () => openEntry(null));
+  $("ef-present").addEventListener("change", syncPresent);
   $("entryForm").addEventListener("submit", saveEntry);
   $("entryModalClose").addEventListener("click", closeEntry);
   $("entryCancel").addEventListener("click", closeEntry);

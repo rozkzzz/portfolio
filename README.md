@@ -52,7 +52,9 @@ python -m http.server 5000 --directory public
 ถ้าเว้นว่าง `photo: ""` จะโชว์ avatar เริ่มต้น (รูป terminal สีเขียว)
 
 **Timeline:** บนหัวตารางมีปุ่มสลับ `[#] TABLE` / `[~] TIMELINE`
-โหมด TIMELINE จะจัดผลงานเป็นเส้นเวลาตามปี (2019, 2020, ...) อัตโนมัติจาก field `date`
+โหมด TIMELINE จะจัดผลงานเป็นเส้นเวลาสลับซ้าย-ขวา (zigzag) มีจุด ✓ บนเส้นกลาง
+แสดงช่วงเวลา (`Jan 2025 to Present`, `Jun 2023 to Dec 2023 (6 months)`) + ชื่อองค์กร
+คำนวณช่วงเดือน/ปีให้อัตโนมัติจาก `date` + `endDate`/`present` — จัดการทุก field ได้จากหน้า admin
 
 **Skills:** แก้ `skills` ใน `sampleProfile` แสดงเป็น chip เล็ก ๆ จัดกลุ่มตาม `category`
 มี level ก็ได้ (0-100 = สีเขียวที่เติมใน chip) ไม่มีก็ได้ ถ้า skill เยอะ (เช่น 100 อัน)
@@ -70,7 +72,10 @@ skills: [
 
 | field | ความหมาย |
 |-------|----------|
-| `date` | วันที่ (`YYYY-MM-DD`) ใช้เรียงลำดับ |
+| `date` | วันเริ่ม (`YYYY-MM-DD`) ใช้เรียงลำดับ + เป็นจุดเริ่มของช่วงเวลาใน timeline |
+| `endDate` | วันสิ้นสุด (ไม่มีก็เว้นว่าง) → timeline โชว์ `Jun 2023 to Dec 2023 (6 months)` |
+| `present` | `true` = งานปัจจุบัน → timeline โชว์ `... to Present` (ทับ `endDate`) |
+| `org` | ชื่อองค์กร/บริษัท โชว์เป็นบรรทัดรองใต้ title ใน timeline (เว้นว่างได้) |
 | `title` / `description` | หัวข้อ + คำอธิบายสั้น |
 | `category` | `project` / `experience` / `research` / `certificate` |
 | `stack` | array ของเทคโนโลยี เช่น `["React","Node"]` |

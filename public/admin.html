@@ -122,7 +122,7 @@
       <form id="entryForm" class="a-form a-form-grid">
         <input id="ef-id" type="hidden" />
         <label class="a-field">
-          <span>date (YYYY-MM-DD)</span>
+          <span>start date</span>
           <input id="ef-date" type="date" required />
         </label>
         <label class="a-field">
@@ -134,9 +134,21 @@
             <option value="certificate">certificate</option>
           </select>
         </label>
+        <label class="a-field">
+          <span>end date</span>
+          <input id="ef-endDate" type="date" />
+        </label>
+        <label class="a-field a-check">
+          <span>duration</span>
+          <label class="a-checkbox"><input id="ef-present" type="checkbox" /> ปัจจุบัน (to Present)</label>
+        </label>
         <label class="a-field a-col-2">
           <span>title</span>
           <input id="ef-title" type="text" required />
+        </label>
+        <label class="a-field a-col-2">
+          <span>organization / subtitle <small>(เช่น ชื่อบริษัท — เว้นว่างได้)</small></span>
+          <input id="ef-org" type="text" placeholder="The Siam Commercial Bank Limited." />
         </label>
         <label class="a-field a-col-2">
           <span>short description</span>

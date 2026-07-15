@@ -49,6 +49,39 @@ function setSource(s) {
 // ---------- rendering ----------
 const riskLabel = { high: "0DAY", med: "MEDIUM", low: "PATCHED" };
 
+// ---------- date helpers (for timeline ranges) ----------
+const MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+function fmtMon(d) {
+  if (!d) return "";
+  const p = String(d).split("-");
+  if (!p[0]) return "";
+  const mi = Number(p[1]) - 1;
+  return `${MONTHS[mi] || ""} ${p[0]}`.trim();
+}
+function durationText(a, b) {
+  if (!a || !b) return "";
+  const da = new Date(a), db = new Date(b);
+  if (isNaN(da) || isNaN(db)) return "";
+  const m = (db.getFullYear() - da.getFullYear()) * 12 + (db.getMonth() - da.getMonth());
+  if (m < 1) return "";
+  const y = Math.floor(m / 12), mm = m % 12;
+  const parts = [];
+  if (y) parts.push(`${y} yr${y > 1 ? "s" : ""}`);
+  if (mm) parts.push(`${mm} month${mm > 1 ? "s" : ""}`);
+  return parts.join(" ");
+}
+function dateRange(e) {
+  const start = fmtMon(e.date);
+  if (!start) return "";
+  if (e.present) return `${start} to Present`;
+  if (e.endDate) {
+    const end = fmtMon(e.endDate);
+    const dur = durationText(e.date, e.endDate);
+    return `${start} to ${end}${dur ? ` (${dur})` : ""}`;
+  }
+  return start;
+}
+
 function filtered() {
   return entries.filter((e) => {
     const catOk = activeCat === "all" || e.category === activeCat;
@@ -123,38 +156,20 @@ function renderTimeline(list) {
     return;
   }
 
-  // newest first (list is already date-desc), then group by year
-  const groups = new Map();
-  for (const e of list) {
-    const year = (e.date || "----").slice(0, 4);
-    if (!groups.has(year)) groups.set(year, []);
-    groups.get(year).push(e);
-  }
-
+  // alternating (zigzag) timeline — newest first (list is already date-desc)
   const flat = []; // keep a flat index so clicks map back to the entry
-  el.innerHTML = [...groups.entries()]
-    .map(([year, items]) => {
-      const label = items.length === 1 ? "1 entry" : `${items.length} entries`;
-      const rows = items
-        .map((e) => {
-          const risk = (e.risk || "low").toLowerCase();
-          const idx = flat.push(e) - 1;
-          return `<div class="tl-item" data-idx="${idx}">
-            <div class="tl-card">
-              <div class="tl-card-head">
-                <span class="tl-date">${esc(e.date || "")}</span>
-                <span class="tag">${esc(e.category || "misc")}</span>
-                <span class="risk ${risk}">${riskLabel[risk] || "PATCHED"}</span>
-              </div>
-              <div class="tl-title">${esc(e.title || "untitled")}</div>
-              <div class="tl-desc">${esc(e.description || "")}</div>
-            </div>
-          </div>`;
-        })
-        .join("");
-      return `<div class="tl-year">
-        <div class="tl-year-label">${esc(year)}<span>${label}</span></div>
-        <div class="tl-items">${rows}</div>
+  el.innerHTML = list
+    .map((e) => {
+      const idx = flat.push(e) - 1;
+      const range = dateRange(e);
+      return `<div class="tl-item" data-idx="${idx}">
+        <span class="tl-node" aria-hidden="true"></span>
+        <div class="tl-content">
+          ${range ? `<div class="tl-range">${esc(range)}</div>` : ""}
+          <div class="tl-title">${esc(e.title || "untitled")}</div>
+          ${e.org ? `<div class="tl-org">${esc(e.org)}</div>` : ""}
+          <div class="tl-desc">${esc(e.description || "")}</div>
+        </div>
       </div>`;
     })
     .join("");
@@ -234,10 +249,12 @@ function openModal(e) {
   const stack = (e.stack || [])
     .map((s) => `<span class="tag">${esc(s)}</span>`)
     .join(" ");
+  const range = dateRange(e) || e.date || "";
   body.innerHTML = `
     <h2>${esc(e.title || "untitled")}</h2>
+    ${e.org ? `<div class="m-org">${esc(e.org)}</div>` : ""}
     <div class="m-meta">
-      <span>[ ${esc(e.date || "")} ]</span>
+      <span>[ ${esc(range)} ]</span>
       <span>category: ${esc(e.category || "misc")}</span>
       <span class="risk ${risk}">${riskLabel[risk] || "PATCHED"}</span>
       <span>${Number(e.views || 0).toLocaleString()} views</span>

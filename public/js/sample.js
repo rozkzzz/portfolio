@@ -64,7 +64,9 @@ export const sampleEntries = [
   {
     id: "e2",
     date: "2026-04-03",
-    title: "Senior Frontend Engineer @ ACME",
+    present: true,                 // -> "Apr 2026 to Present" in the timeline
+    title: "Senior Frontend Engineer",
+    org: "ACME Corp",              // shows as the subtitle under the title
     description: "Led migration of a legacy dashboard to a modern component system.",
     category: "experience",
     stack: ["TypeScript", "Next.js", "GraphQL"],
@@ -112,7 +114,9 @@ export const sampleEntries = [
   {
     id: "e6",
     date: "2021-01-15",
-    title: "Backend Developer @ StartupX",
+    endDate: "2021-12-01",         // -> "Jan 2021 to Dec 2021 (11 months)"
+    title: "Backend Developer",
+    org: "StartupX",
     description: "Built and scaled REST APIs for a fintech product.",
     category: "experience",
     stack: ["Node", "PostgreSQL", "AWS"],
