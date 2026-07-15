@@ -194,7 +194,7 @@ function renderSkills() {
   const el = document.getElementById("skillList");
   const raw = profile.skills || [];
   if (!raw.length) {
-    el.innerHTML = `<div class="skill-empty">// add skills in sample.js</div>`;
+    el.innerHTML = `<div class="skill-empty">// add skills from the admin panel</div>`;
     return;
   }
   // normalize: plain string -> { name }

@@ -8,15 +8,18 @@
 ```
 public/            <- ตัวเว็บ (static, ไม่มี build step)  = สิ่งที่ถูก deploy
   index.html
+  admin.html             <- หน้า admin (ล็อกอินแล้วเพิ่ม/แก้/ลบข้อมูลได้)
   css/style.css
+  css/admin.css          <- สไตล์ของหน้า admin
   js/app.js              logic + โหลดข้อมูลจาก Firestore
+  js/admin.js            <- logic หน้า admin (auth + เขียนข้อมูล)
   js/firebase-config.js  <- ใส่ค่า config ตรงนี้
   js/sample.js           <- ข้อมูลตัวอย่าง (แก้เป็นของตัวเองได้)
   .nojekyll              (บอก GitHub Pages ไม่ต้องประมวลผลไฟล์)
 seed/seed.mjs      <- สคริปต์อัปข้อมูลขึ้น Firestore ครั้งเดียว
 .github/workflows/deploy.yml  <- auto-deploy ขึ้น GitHub Pages เมื่อ push
 vercel.json        <- ตั้งค่าเผื่ออยากใช้ Vercel แทน
-firestore.rules    <- อ่านได้ทุกคน / เขียนไม่ได้จาก client
+firestore.rules    <- อ่านได้ทุกคน / เขียนได้เฉพาะเจ้าของที่ล็อกอิน
 ```
 
 > **แนวคิดง่าย ๆ:** เว็บ (ไฟล์ใน `public/`) ไปอยู่บน GitHub Pages หรือ Vercel
@@ -116,6 +119,36 @@ Firestore → สร้าง collection ชื่อ `entries` เพิ่ม 
 
 ---
 
+## ส่วนที่ 1.5 — หน้า Admin (เพิ่ม/แก้ข้อมูลผ่านหน้าเว็บ ไม่ต้องแก้ code)
+
+หน้า `admin.html` ให้ล็อกอินแล้วจัดการ **entries (project/experience/timeline), skills และ profile**
+ได้จากเบราว์เซอร์เลย — ไม่ต้องเข้า Firebase Console หรือแก้ `sample.js` อีก
+(ต้องทำ "ส่วนที่ 1 — ต่อ Firebase" ให้เสร็จก่อน เพราะ admin เขียนข้อมูลลง Firestore)
+
+### 1) เปิดระบบล็อกอิน + สร้างบัญชีเจ้าของ
+1. Firebase Console → **Build → Authentication → Get started**
+2. แท็บ **Sign-in method → เพิ่ม Email/Password → เปิด (Enable) → Save**
+3. แท็บ **Users → Add user** → ใส่อีเมล + รหัสผ่านของคุณ (นี่คือบัญชีเดียวที่แก้เว็บได้)
+
+### 2) อัปเดต security rules ให้เจ้าของเขียนได้
+Firebase Console → **Firestore → Rules** → วางเนื้อหาล่าสุดจากไฟล์ `firestore.rules`
+(อ่านได้ทุกคน / **เขียนได้เฉพาะคนที่ล็อกอิน**) → **Publish**
+
+> อยากล็อกให้เขียนได้เฉพาะ uid ตัวเอง: ดูคอมเมนต์ในไฟล์ `firestore.rules`
+> เอา uid จาก Authentication → Users มาแทน `request.auth != null`
+
+### 3) เข้าใช้งาน
+เปิด `.../admin.html` (เช่น `https://<username>.github.io/<repo>/admin.html`)
+→ ล็อกอินด้วยอีเมล/รหัสที่สร้างไว้ → มี 3 แท็บ:
+- **ENTRIES** — เพิ่ม/แก้/ลบผลงาน (ทุก field: date, title, category, risk, stack, body, link ...)
+- **SKILLS** — เพิ่ม/ลบ/แก้ skill พร้อม category และ level (0-100) กด *save skills*
+- **PROFILE** — แก้ชื่อ/role/bio/รูป/ลิงก์ กด *save profile*
+
+บันทึกแล้วรีเฟรชหน้าเว็บหลัก ข้อมูลจะอัปเดตทันที
+(หน้า admin ตั้ง `noindex` ไว้ ไม่โผล่ใน Google — แต่กันคนแก้ด้วย "ล็อกอิน" ไม่ใช่การซ่อน URL)
+
+---
+
 ## ส่วนที่ 2 — เอาเว็บขึ้นออนไลน์ (เลือกอย่างเดียว)
 
 ### ตัวเลือก A: GitHub Pages  ← แนะนำ ง่ายสุด
@@ -146,6 +179,7 @@ Firestore → สร้าง collection ชื่อ `entries` เพิ่ม 
 ---
 
 ## หมายเหตุความปลอดภัย
-- `firestore.rules` = **อ่านได้ทุกคน เขียนไม่ได้จาก client** เหมาะกับ portfolio สาธารณะ
+- `firestore.rules` = **อ่านได้ทุกคน / เขียนได้เฉพาะคนที่ล็อกอิน** (หน้า admin) — คนทั่วไปแก้ข้อมูลไม่ได้
+- ความปลอดภัยมาจาก "ล็อกอิน + rules" ไม่ใช่การซ่อน URL ของ `admin.html` — ใครเปิดหน้านั้นได้ก็จริง แต่ถ้าไม่มีบัญชีก็เขียนอะไรไม่ได้
 - ค่าใน `firebaseConfig` เป็นข้อมูล public ปกติ เปิดเผยได้ (โผล่ใน GitHub ได้ ไม่เป็นไร)
 - สิ่งที่ **ห้ามเปิดเผย/ห้าม commit** คือ `seed/serviceAccount.json` เท่านั้น (gitignore ไว้แล้ว)

@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>0DAY.PORTFOLIO :: admin</title>
+  <link rel="stylesheet" href="./css/style.css" />
+  <link rel="stylesheet" href="./css/admin.css" />
+</head>
+<body>
+  <div class="scanlines" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="wrap topbar-inner">
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">[~]</span>
+        <span class="brand-name">0DAY<span class="dot">.</span>ADMIN</span>
+        <span class="brand-sub">// control panel</span>
+      </a>
+      <div class="status">
+        <span id="whoami" class="pill" hidden><i class="who-dot"></i> <span id="whoamiEmail"></span></span>
+        <button id="logoutBtn" class="a-btn ghost" hidden>logout</button>
+        <a class="a-btn ghost" href="./index.html">&larr; view site</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===== LOGIN ===== -->
+  <main id="loginScreen" class="wrap a-login" hidden>
+    <div class="a-card a-login-card">
+      <h1 class="a-title">// AUTHENTICATE</h1>
+      <p class="a-hint">Sign in with the owner account to manage this portfolio.</p>
+      <form id="loginForm" class="a-form">
+        <label class="a-field">
+          <span>email</span>
+          <input id="loginEmail" type="email" autocomplete="username" required />
+        </label>
+        <label class="a-field">
+          <span>password</span>
+          <input id="loginPass" type="password" autocomplete="current-password" required />
+        </label>
+        <button class="a-btn" type="submit">&gt; sign in</button>
+        <div id="loginError" class="a-error" hidden></div>
+      </form>
+    </div>
+  </main>
+
+  <!-- ===== DASHBOARD ===== -->
+  <main id="dashboard" class="wrap a-dash" hidden>
+    <nav class="a-tabs" id="adminTabs">
+      <button class="a-tab active" data-panel="entries">/ ENTRIES</button>
+      <button class="a-tab" data-panel="skills">/ SKILLS</button>
+      <button class="a-tab" data-panel="profile">/ PROFILE</button>
+    </nav>
+
+    <!-- ENTRIES -->
+    <section id="panel-entries" class="a-panel">
+      <div class="a-panel-head">
+        <h2 class="a-title">// ENTRIES <span id="entriesCount" class="a-count">0</span></h2>
+        <button id="newEntryBtn" class="a-btn">+ new entry</button>
+      </div>
+      <div id="entriesList" class="a-list">
+        <div class="a-empty">loading…</div>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section id="panel-skills" class="a-panel" hidden>
+      <div class="a-panel-head">
+        <h2 class="a-title">// SKILLS <span id="skillsCount" class="a-count">0</span></h2>
+        <button id="newSkillBtn" class="a-btn">+ add skill</button>
+      </div>
+      <p class="a-hint">Drag isn't needed — order here is the display order. Set a level 0–100 for a fill bar, and a category to group chips.</p>
+      <div id="skillsRows" class="a-skillrows"></div>
+      <div class="a-panel-foot">
+        <button id="saveSkillsBtn" class="a-btn">save skills</button>
+        <span id="skillsStatus" class="a-status"></span>
+      </div>
+    </section>
+
+    <!-- PROFILE -->
+    <section id="panel-profile" class="a-panel" hidden>
+      <div class="a-panel-head">
+        <h2 class="a-title">// PROFILE</h2>
+      </div>
+      <form id="profileForm" class="a-form a-form-grid">
+        <label class="a-field">
+          <span>name</span>
+          <input id="pf-name" type="text" />
+        </label>
+        <label class="a-field">
+          <span>role</span>
+          <input id="pf-role" type="text" />
+        </label>
+        <label class="a-field a-col-2">
+          <span>bio</span>
+          <textarea id="pf-bio" rows="3"></textarea>
+        </label>
+        <label class="a-field a-col-2">
+          <span>photo (path or URL)</span>
+          <input id="pf-photo" type="text" placeholder="./img/profile.svg" />
+        </label>
+        <div class="a-field a-col-2">
+          <span>links</span>
+          <div id="pf-links" class="a-linkrows"></div>
+          <button type="button" id="addLinkBtn" class="a-btn ghost small">+ add link</button>
+        </div>
+        <div class="a-panel-foot a-col-2">
+          <button class="a-btn" type="submit">save profile</button>
+          <span id="profileStatus" class="a-status"></span>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <!-- ===== ENTRY MODAL ===== -->
+  <div id="entryModal" class="modal" hidden>
+    <div class="modal-card a-modal-card">
+      <button class="modal-close" id="entryModalClose" aria-label="close">[x]</button>
+      <h2 id="entryModalTitle">// NEW ENTRY</h2>
+      <form id="entryForm" class="a-form a-form-grid">
+        <input id="ef-id" type="hidden" />
+        <label class="a-field">
+          <span>date (YYYY-MM-DD)</span>
+          <input id="ef-date" type="date" required />
+        </label>
+        <label class="a-field">
+          <span>category</span>
+          <select id="ef-category">
+            <option value="project">project</option>
+            <option value="experience">experience</option>
+            <option value="research">research</option>
+            <option value="certificate">certificate</option>
+          </select>
+        </label>
+        <label class="a-field a-col-2">
+          <span>title</span>
+          <input id="ef-title" type="text" required />
+        </label>
+        <label class="a-field a-col-2">
+          <span>short description</span>
+          <input id="ef-description" type="text" />
+        </label>
+        <label class="a-field">
+          <span>risk</span>
+          <select id="ef-risk">
+            <option value="low">low (PATCHED)</option>
+            <option value="med">med (MEDIUM)</option>
+            <option value="high">high (0DAY)</option>
+          </select>
+        </label>
+        <label class="a-field">
+          <span>views</span>
+          <input id="ef-views" type="number" min="0" value="0" />
+        </label>
+        <label class="a-field a-col-2">
+          <span>stack (comma separated)</span>
+          <input id="ef-stack" type="text" placeholder="React, Node, Redis" />
+        </label>
+        <label class="a-field a-col-2">
+          <span>body / details</span>
+          <textarea id="ef-body" rows="6"></textarea>
+        </label>
+        <label class="a-field a-col-2">
+          <span>link (optional)</span>
+          <input id="ef-link" type="text" placeholder="https://…" />
+        </label>
+        <div class="a-modal-foot a-col-2">
+          <button id="deleteEntryBtn" class="a-btn danger" type="button" hidden>delete</button>
+          <div class="grow"></div>
+          <button class="a-btn ghost" type="button" id="entryCancel">cancel</button>
+          <button class="a-btn" type="submit">save entry</button>
+        </div>
+        <div id="entryError" class="a-error a-col-2" hidden></div>
+      </form>
+    </div>
+  </div>
+
+  <script type="module" src="./js/admin.js"></script>
+</body>
+</html>

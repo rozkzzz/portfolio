@@ -156,12 +156,17 @@ table.db tbody tr:hover .entry-title { color: var(--green); text-shadow: 0 0 8px
 .bio { color: var(--text); font-size: 12.5px; margin: 8px 0 0; }
 .links { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .links a { font-size: 12px; border: 1px solid var(--line); padding: 4px 9px; border-radius: 3px; }
-.skilllist { max-height: 300px; overflow-y: auto; padding-right: 4px; margin: -2px 0; }
-.skill-group + .skill-group { margin-top: 14px; }
-.skill-group-title { color: var(--green-dim); font-size: 10.5px; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 8px; }
-.skill-group-title span { color: var(--muted); }
-.chips { display: flex; flex-wrap: wrap; gap: 6px; }
-.skill-chip { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 3px; padding: 4px 9px; font-size: 12px; color: var(--text); background: #060b08; }
+.skilllist { max-height: 360px; overflow-y: auto; padding-right: 6px; margin: -2px 0; }
+.skill-group + .skill-group { margin-top: 12px; }
+.skill-group-title {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--green-dim); font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+  margin-bottom: 8px;
+}
+.skill-group-title::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+.skill-group-title span { color: var(--muted); letter-spacing: 0; }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; }
+.skill-chip { position: relative; overflow: hidden; border: 1px solid var(--line); border-radius: 3px; padding: 3px 8px; font-size: 11.5px; color: var(--text); background: #060b08; transition: border-color .12s; }
 .skill-chip b { position: relative; font-weight: 500; white-space: nowrap; }
 .chip-fill { position: absolute; left: 0; top: 0; bottom: 0; background: rgba(51,255,102,0.16); border-right: 1px solid var(--green-dim); animation: skillfill .7s ease-out; }
 .skill-chip:hover { border-color: var(--green-dim); }
