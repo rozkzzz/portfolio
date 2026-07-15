@@ -7,6 +7,7 @@ let profile = sampleProfile;
 let activeCat = "all";
 let query = "";
 let activeView = "table";
+let activeSort = "date-desc";
 
 // ---------- data loading ----------
 async function loadData() {
@@ -98,8 +99,29 @@ function esc(s) {
   );
 }
 
+// render a stack array as small tags
+function stackTags(stack) {
+  if (!stack || !stack.length) return "";
+  return stack.map((s) => `<span class="tag">${esc(s)}</span>`).join("");
+}
+
+function applySort(list) {
+  const arr = list.slice();
+  const byDate = (a, b, dir) => dir * String(a.date || "").localeCompare(String(b.date || ""));
+  switch (activeSort) {
+    case "date-asc": arr.sort((a, b) => byDate(a, b, 1)); break;
+    case "category": arr.sort((a, b) =>
+      String(a.category || "").localeCompare(String(b.category || "")) || byDate(a, b, -1)); break;
+    case "title": arr.sort((a, b) =>
+      String(a.title || "").localeCompare(String(b.title || ""))); break;
+    case "views": arr.sort((a, b) => Number(b.views || 0) - Number(a.views || 0)); break;
+    default: arr.sort((a, b) => byDate(a, b, -1)); // date-desc
+  }
+  return arr;
+}
+
 function renderView() {
-  const list = filtered();
+  const list = applySort(filtered());
   document.getElementById("count").textContent = `${list.length} records`;
   const tableView = document.getElementById("tableView");
   const timelineView = document.getElementById("timelineView");
@@ -128,7 +150,9 @@ function renderRows(list) {
   rows.innerHTML = list
     .map((e, i) => {
       const risk = (e.risk || "low").toLowerCase();
-      const stack = (e.stack || []).slice(0, 3).map((s) => esc(s)).join(", ");
+      const stackArr = (e.stack || []).slice(0, 4);
+      const extra = (e.stack || []).length - stackArr.length;
+      const stack = stackTags(stackArr) + (extra > 0 ? `<span class="stack-more">+${extra}</span>` : "");
       return `<tr data-idx="${i}">
         <td class="c-date">${esc(e.date || "")}</td>
         <td class="c-title">
@@ -136,7 +160,7 @@ function renderRows(list) {
           <div class="entry-desc">${esc(e.description || "")}</div>
         </td>
         <td class="c-cat"><span class="tag">${esc(e.category || "misc")}</span></td>
-        <td class="c-stack"><span class="stack">${stack || "&mdash;"}</span></td>
+        <td class="c-stack"><div class="stack-tags">${stack || "&mdash;"}</div></td>
         <td class="c-risk"><span class="risk ${risk}">${riskLabel[risk] || "PATCHED"}</span></td>
         <td class="c-num num">${Number(e.views || 0).toLocaleString()}</td>
       </tr>`;
@@ -169,6 +193,7 @@ function renderTimeline(list) {
           <div class="tl-title">${esc(e.title || "untitled")}</div>
           ${e.org ? `<div class="tl-org">${esc(e.org)}</div>` : ""}
           <div class="tl-desc">${esc(e.description || "")}</div>
+          ${e.stack && e.stack.length ? `<div class="tl-stack">${stackTags(e.stack)}</div>` : ""}
         </div>
       </div>`;
     })
@@ -287,6 +312,11 @@ function wireEvents() {
     document.querySelectorAll(".vbtn").forEach((b) => b.classList.remove("active"));
     btn.classList.add("active");
     activeView = btn.dataset.view;
+    renderView();
+  });
+
+  document.getElementById("sortSelect").addEventListener("change", (ev) => {
+    activeSort = ev.target.value;
     renderView();
   });
 

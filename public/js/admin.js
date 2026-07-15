@@ -156,7 +156,16 @@ function openEntry(entry) {
   show($("deleteEntryBtn"), !isNew);
   show($("entryError"), false);
   syncPresent();
+  renderStackPreview();
   show($("entryModal"), true);
+}
+
+// live "chips" preview for the stack input
+function renderStackPreview() {
+  const tags = $("ef-stack").value.split(",").map((s) => s.trim()).filter(Boolean);
+  $("ef-stack-preview").innerHTML = tags
+    .map((t) => `<span class="tag">${escapeHtml(t)}</span>`)
+    .join("");
 }
 
 // when "Present" is ticked, the end date is not used
@@ -368,6 +377,7 @@ function wireUI() {
   // entries
   $("newEntryBtn").addEventListener("click", () => openEntry(null));
   $("ef-present").addEventListener("change", syncPresent);
+  $("ef-stack").addEventListener("input", renderStackPreview);
   $("entryForm").addEventListener("submit", saveEntry);
   $("entryModalClose").addEventListener("click", closeEntry);
   $("entryCancel").addEventListener("click", closeEntry);

@@ -92,6 +92,15 @@ code { color: var(--amber); }
 .vbtn + .vbtn { border-left: 1px solid var(--line); }
 .vbtn:hover { color: var(--green-soft); }
 .vbtn.active { background: rgba(51,255,102,0.08); color: var(--green); text-shadow: 0 0 8px var(--green-dim); }
+.sortbox { display: inline-flex; align-items: center; gap: 6px; }
+.sortbox > span { color: var(--muted); font-size: 11px; letter-spacing: .5px; }
+.sortbox select {
+  font-family: var(--mono); font-size: 11.5px; color: var(--green-soft);
+  background: #060b08; border: 1px solid var(--line); border-radius: 3px;
+  padding: 4px 8px; cursor: pointer; outline: none; transition: border-color .12s;
+}
+.sortbox select:hover, .sortbox select:focus { border-color: var(--green-dim); }
+.sortbox select option { background: #060b08; color: var(--green-soft); }
 
 /* ---------- timeline (alternating / zigzag) ---------- */
 .timeline { position: relative; max-width: 900px; margin: 0 auto; padding: 28px 0 34px; }
@@ -121,6 +130,10 @@ code { color: var(--amber); }
 .tl-item:hover .tl-title { color: var(--green); text-shadow: 0 0 8px var(--green-dim); }
 .tl-org { color: var(--green-soft); font-weight: 600; font-size: 13.5px; margin-top: 2px; }
 .tl-desc { color: var(--muted); font-size: 12.5px; line-height: 1.65; margin-top: 7px; }
+.tl-stack { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.tl-item:nth-child(odd) .tl-stack { justify-content: flex-end; }
+.tl-item:nth-child(even) .tl-stack { justify-content: flex-start; }
+.tl-item:hover .tl-stack .tag { border-color: var(--green-dim); color: var(--green-soft); }
 
 @media (max-width: 700px) {
   .timeline { max-width: 100%; padding-left: 2px; }
@@ -130,6 +143,7 @@ code { color: var(--amber); }
   .tl-item:nth-child(even) { width: 100%; left: 0; text-align: left; padding: 12px 6px 12px 38px; }
   .tl-item:nth-child(odd) .tl-node,
   .tl-item:nth-child(even) .tl-node { left: -1px; right: auto; }
+  .tl-item:nth-child(odd) .tl-stack { justify-content: flex-start; }
 }
 
 /* ---------- table ---------- */
@@ -146,8 +160,11 @@ table.db tbody tr:hover .entry-title { color: var(--green); text-shadow: 0 0 8px
 .c-date { color: var(--muted); white-space: nowrap; }
 .entry-title { color: var(--green-soft); font-weight: 600; }
 .entry-desc { color: var(--muted); font-size: 12px; margin-top: 3px; }
-.tag { display: inline-block; font-size: 11px; padding: 2px 7px; border: 1px solid var(--line); border-radius: 3px; color: var(--green-dim); }
+.tag { display: inline-block; font-size: 11px; padding: 2px 7px; border: 1px solid var(--line); border-radius: 3px; color: var(--green-dim); transition: all .12s; }
 .stack { color: var(--muted); font-size: 12px; }
+.stack-tags { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.stack-more { font-size: 11px; color: var(--muted); }
+table.db tbody tr:hover .tag { border-color: var(--green-dim); color: var(--green-soft); }
 .num { color: var(--green-dim); text-align: right; }
 .loading { color: var(--muted); text-align: center; padding: 30px; }
 .empty { color: var(--muted); text-align: center; padding: 30px; }

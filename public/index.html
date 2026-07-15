@@ -47,6 +47,16 @@
         <div class="panel-head">
           <h1 id="panelTitle" class="panel-title">// LATEST ENTRIES</h1>
           <div class="head-right">
+            <label class="sortbox">
+              <span>sort:</span>
+              <select id="sortSelect">
+                <option value="date-desc">date &darr; newest</option>
+                <option value="date-asc">date &uarr; oldest</option>
+                <option value="category">category</option>
+                <option value="title">title A&ndash;Z</option>
+                <option value="views">views</option>
+              </select>
+            </label>
             <div class="viewtoggle" id="viewtoggle">
               <button class="vbtn active" data-view="table">[#] TABLE</button>
               <button class="vbtn" data-view="timeline">[~] TIMELINE</button>
