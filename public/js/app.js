@@ -7,7 +7,8 @@ let profile = sampleProfile;
 let activeCat = "all";
 let query = "";
 let activeView = "table";
-let activeSort = "date-desc";
+let sortKey = "date";
+let sortDir = -1; // 1 = ascending (น้อย→มาก), -1 = descending (มาก→น้อย)
 
 // ---------- data loading ----------
 async function loadData() {
@@ -105,19 +106,41 @@ function stackTags(stack) {
   return stack.map((s) => `<span class="tag">${esc(s)}</span>`).join("");
 }
 
+const RISK_RANK = { high: 3, med: 2, low: 1 };
+function cmp(a, b, key) {
+  switch (key) {
+    case "views": return Number(a.views || 0) - Number(b.views || 0);
+    case "risk": return (RISK_RANK[(a.risk || "low").toLowerCase()] || 0) - (RISK_RANK[(b.risk || "low").toLowerCase()] || 0);
+    case "title": return String(a.title || "").localeCompare(String(b.title || ""));
+    case "category": return String(a.category || "").localeCompare(String(b.category || ""));
+    default: return String(a.date || "").localeCompare(String(b.date || "")); // date
+  }
+}
 function applySort(list) {
   const arr = list.slice();
-  const byDate = (a, b, dir) => dir * String(a.date || "").localeCompare(String(b.date || ""));
-  switch (activeSort) {
-    case "date-asc": arr.sort((a, b) => byDate(a, b, 1)); break;
-    case "category": arr.sort((a, b) =>
-      String(a.category || "").localeCompare(String(b.category || "")) || byDate(a, b, -1)); break;
-    case "title": arr.sort((a, b) =>
-      String(a.title || "").localeCompare(String(b.title || ""))); break;
-    case "views": arr.sort((a, b) => Number(b.views || 0) - Number(a.views || 0)); break;
-    default: arr.sort((a, b) => byDate(a, b, -1)); // date-desc
-  }
+  arr.sort((a, b) => sortDir * cmp(a, b, sortKey) || String(a.date || "").localeCompare(String(b.date || "")) * -1);
   return arr;
+}
+
+// clicking a header: same column -> flip direction; new column -> sensible default
+function setSort(key) {
+  if (sortKey === key) {
+    sortDir = -sortDir;
+  } else {
+    sortKey = key;
+    sortDir = (key === "title" || key === "category") ? 1 : -1;
+  }
+  updateSortIndicators();
+  renderView();
+}
+
+function updateSortIndicators() {
+  document.querySelectorAll("#dbHead .sortable").forEach((th) => {
+    const active = th.dataset.sort === sortKey;
+    th.classList.toggle("active", active);
+    const arrow = th.querySelector(".sarrow");
+    if (arrow) arrow.textContent = active ? (sortDir === 1 ? " ▲" : " ▼") : "";
+  });
 }
 
 function renderView() {
@@ -315,9 +338,10 @@ function wireEvents() {
     renderView();
   });
 
-  document.getElementById("sortSelect").addEventListener("change", (ev) => {
-    activeSort = ev.target.value;
-    renderView();
+  document.getElementById("dbHead").addEventListener("click", (ev) => {
+    const th = ev.target.closest(".sortable");
+    if (!th) return;
+    setSort(th.dataset.sort);
   });
 
   document.getElementById("search").addEventListener("input", (ev) => {
@@ -352,5 +376,6 @@ function startClock() {
   await loadData();
   renderProfile();
   renderStats();
+  updateSortIndicators();
   renderView();
 })();

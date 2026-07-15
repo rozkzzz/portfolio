@@ -92,15 +92,11 @@ code { color: var(--amber); }
 .vbtn + .vbtn { border-left: 1px solid var(--line); }
 .vbtn:hover { color: var(--green-soft); }
 .vbtn.active { background: rgba(51,255,102,0.08); color: var(--green); text-shadow: 0 0 8px var(--green-dim); }
-.sortbox { display: inline-flex; align-items: center; gap: 6px; }
-.sortbox > span { color: var(--muted); font-size: 11px; letter-spacing: .5px; }
-.sortbox select {
-  font-family: var(--mono); font-size: 11.5px; color: var(--green-soft);
-  background: #060b08; border: 1px solid var(--line); border-radius: 3px;
-  padding: 4px 8px; cursor: pointer; outline: none; transition: border-color .12s;
-}
-.sortbox select:hover, .sortbox select:focus { border-color: var(--green-dim); }
-.sortbox select option { background: #060b08; color: var(--green-soft); }
+/* clickable sortable table headers */
+th.sortable { cursor: pointer; user-select: none; transition: color .12s; }
+th.sortable:hover { color: var(--green-soft); }
+th.sortable.active { color: var(--green); text-shadow: 0 0 8px var(--green-dim); }
+th.sortable .sarrow { color: var(--green); font-size: 10px; }
 
 /* ---------- timeline (alternating / zigzag) ---------- */
 .timeline { position: relative; max-width: 900px; margin: 0 auto; padding: 28px 0 34px; }

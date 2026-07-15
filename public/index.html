@@ -47,16 +47,6 @@
         <div class="panel-head">
           <h1 id="panelTitle" class="panel-title">// LATEST ENTRIES</h1>
           <div class="head-right">
-            <label class="sortbox">
-              <span>sort:</span>
-              <select id="sortSelect">
-                <option value="date-desc">date &darr; newest</option>
-                <option value="date-asc">date &uarr; oldest</option>
-                <option value="category">category</option>
-                <option value="title">title A&ndash;Z</option>
-                <option value="views">views</option>
-              </select>
-            </label>
             <div class="viewtoggle" id="viewtoggle">
               <button class="vbtn active" data-view="table">[#] TABLE</button>
               <button class="vbtn" data-view="timeline">[~] TIMELINE</button>
@@ -68,13 +58,13 @@
         <div id="tableView" class="table-wrap">
           <table class="db">
             <thead>
-              <tr>
-                <th class="c-date">DATE</th>
-                <th class="c-title">TITLE / DESCRIPTION</th>
-                <th class="c-cat">CATEGORY</th>
+              <tr id="dbHead">
+                <th class="c-date sortable" data-sort="date">DATE<span class="sarrow"></span></th>
+                <th class="c-title sortable" data-sort="title">TITLE / DESCRIPTION<span class="sarrow"></span></th>
+                <th class="c-cat sortable" data-sort="category">CATEGORY<span class="sarrow"></span></th>
                 <th class="c-stack">STACK</th>
-                <th class="c-risk">RISK</th>
-                <th class="c-num">VIEWS</th>
+                <th class="c-risk sortable" data-sort="risk">RISK<span class="sarrow"></span></th>
+                <th class="c-num sortable" data-sort="views">VIEWS<span class="sarrow"></span></th>
               </tr>
             </thead>
             <tbody id="rows">
